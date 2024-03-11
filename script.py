@@ -27,6 +27,7 @@ def scrape_data_point():
     data_point = None
 
     if req.ok:
+        print("First Request for the DP is OK")
         soup = bs4.BeautifulSoup(req.text, "html.parser")
         target_element = soup.find("a", class_="frontpage-link")
         headline_article = target_element['href']
@@ -37,9 +38,10 @@ def scrape_data_point():
         loguru.logger.info(f"Request status code for article: {req1.status_code}")
 
         if req1.ok:
+            loguru.logger.info("Second Request for the headline article is OK")
             soup1 = bs4.BeautifulSoup(req1.text, "html.parser")
             target_element = soup1.find("a", class_="author-name")
-            data_point = "" if target_element is not None else target_element.text 
+            data_point = "" if target_element is None else target_element.text 
 
     loguru.logger.info(f"Data point: {data_point}")
     return data_point 
