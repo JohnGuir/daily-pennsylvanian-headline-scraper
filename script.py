@@ -24,12 +24,25 @@ def scrape_data_point():
     loguru.logger.info(f"Request URL: {req.url}")
     loguru.logger.info(f"Request status code: {req.status_code}")
 
+    data_point = None
+
     if req.ok:
         soup = bs4.BeautifulSoup(req.text, "html.parser")
         target_element = soup.find("a", class_="frontpage-link")
-        data_point = "" if target_element is None else target_element.text
-        loguru.logger.info(f"Data point: {data_point}")
-        return data_point
+        headline_article = target_element['href']
+
+        # Creating another request to get to the headline article itself
+        req1 = requests.get(headline_article)
+        loguru.logger.info(f"Request URL for article: {req1.url}")
+        loguru.logger.info(f"Request status code for article: {req1.status_code}")
+
+        if req1.ok:
+            soup1 = bs4.BeautifulSoup(req1.text, "html.parser")
+            target_element = soup1.find("a", class_="author-name")
+            data_point = "" if target_element is not None else target_element.text 
+
+    loguru.logger.info(f"Data point: {data_point}")
+    return data_point 
 
 
 if __name__ == "__main__":
